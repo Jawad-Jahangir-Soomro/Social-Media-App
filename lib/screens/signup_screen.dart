@@ -3,6 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_media_app/responsive/mobile_screen_layout.dart';
+import 'package:social_media_app/responsive/responsive_layout_screen.dart';
+import 'package:social_media_app/responsive/web_screen_layout.dart';
+import 'package:social_media_app/screens/login_screen.dart';
 import 'package:social_media_app/utils/colors.dart';
 import 'package:social_media_app/utils/utils.dart';
 import 'package:social_media_app/widgets/text_field_input.dart';
@@ -33,7 +37,6 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void signUpUser() async {
-
     setState(() {
       _isLoading = true;
     });
@@ -50,10 +53,18 @@ class _SignupScreenState extends State<SignupScreen> {
       _isLoading = false;
     });
 
-    if(res != "success"){
+    if (res != "Success") {
       showSnackBar(res, context);
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(),
+            mobileScreenLayout: MobileScreenLayout(),
+          ),
+        ),
+      );
     }
-
   }
 
   void _selectImage() async {
@@ -96,9 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   _image != null
                       ? CircleAvatar(
-                          radius: 64,
-                          backgroundImage: MemoryImage(_image!)
-                        )
+                          radius: 64, backgroundImage: MemoryImage(_image!))
                       : const CircleAvatar(
                           radius: 64,
                           backgroundImage: NetworkImage(
@@ -106,7 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                   Positioned(
                     bottom: -10,
-                    left: screenWidth * 0.2, // Responsive position
+                    left: 90, // Responsive position
                     child: IconButton(
                       onPressed: _selectImage,
                       icon: const Icon(Icons.add_a_photo),
@@ -173,7 +182,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     color: blueColor,
                   ),
-                  child: _isLoading? const Center(child: CircularProgressIndicator(color: primaryColor,),) : const Text("Sign Up"),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryColor,
+                          ),
+                        )
+                      : const Text("Sign Up"),
                 ),
               ),
               // Transitioning to Signup
@@ -192,11 +207,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: const Text("Don't have an account?"),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginScreen()));
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: const Text(
-                        " SignUp.",
+                        "LogIn",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
