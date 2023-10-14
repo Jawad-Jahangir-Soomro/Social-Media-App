@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:social_media_app/models/post.dart';
 import 'package:social_media_app/resources/storage_methods.dart';
 import 'package:uuid/uuid.dart';
@@ -55,7 +55,9 @@ class FirestoreMethods {
         });
       }
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
@@ -82,24 +84,60 @@ class FirestoreMethods {
             'commentId': commentId,
             'datePublished': DateTime.now(),
           });
-      }
-      else{
-        print("Text is Empty");
+      } else {
+        if (kDebugMode) {
+          print("Text is Empty");
+        }
       }
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
   // Deleting Post
 
-  Future<void> deletePost(String postId)async{
-    try{
+  Future<void> deletePost(String postId) async {
+    try {
       await FirebaseFirestore.instance.collection("posts").doc(postId).delete();
-    }
-    catch(err){
-      print(err.toString());
+    } catch (err) {
+      if (kDebugMode) {
+        print(err.toString());
+      }
     }
   }
 
+  Future<void> followUser(
+    String uid,
+    String followId,
+  ) async {
+    try {
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(uid).get();
+      List following = (snap.data()! as dynamic)['following'];
+
+      if (following.contains(followId)) {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayRemove([uid]),
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayRemove([followId]),
+        });
+      } else {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayUnion([uid]),
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayUnion([followId]),
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
 }
