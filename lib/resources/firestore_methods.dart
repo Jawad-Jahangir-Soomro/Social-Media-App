@@ -43,16 +43,19 @@ class FirestoreMethods {
     return res;
   }
 
-  Future<void> likePost(String postId, String uid, List likes) async {
+  Future<void> likePost(String postId, String uid, List likes, String name, String profilePic, String action) async {
     try {
       if (likes.contains(uid)) {
         await _firestore.collection('posts').doc(postId).update({
           'likes': FieldValue.arrayRemove([uid]),
         });
+
       } else {
         await _firestore.collection('posts').doc(postId).update({
           'likes': FieldValue.arrayUnion([uid]),
         });
+        notification(postId, uid, name, profilePic, action);
+
       }
     } catch (e) {
       if (kDebugMode) {
@@ -82,6 +85,44 @@ class FirestoreMethods {
             'uid': uid,
             'text': text,
             'commentId': commentId,
+            'datePublished': DateTime.now(),
+          });
+
+        notification(postId, uid, name, profilePic, "commented");
+
+      } else {
+        if (kDebugMode) {
+          print("Text is Empty");
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
+  Future<void> notification(
+    String postId,
+    String uid,
+    String name,
+    String profilePic,
+    String action,
+  ) async {
+    try {
+      if (action.isNotEmpty) {
+        String notifyId = const Uuid().v1();
+        await _firestore
+          ..collection('posts')
+              .doc(postId)
+              .collection('notificatoion')
+              .doc(notifyId)
+              .set({
+            'profilePic': profilePic,
+            'name': name,
+            'uid': uid,
+            'action': action,
+            'notifyId': notifyId,
             'datePublished': DateTime.now(),
           });
       } else {

@@ -7,6 +7,8 @@ import 'package:social_media_app/resources/firestore_methods.dart';
 import 'package:social_media_app/utils/colors.dart';
 import 'package:social_media_app/widgets/comment_card.dart';
 
+import '../utils/global_variables.dart';
+
 class CommentsScreen extends StatefulWidget {
   final snap;
   const CommentsScreen({Key? key, required this.snap}) : super(key: key);

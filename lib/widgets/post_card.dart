@@ -10,6 +10,7 @@ import 'package:social_media_app/utils/global_variables.dart';
 import 'package:social_media_app/utils/utils.dart';
 import 'package:social_media_app/widgets/like_animation.dart';
 import 'package:social_media_app/models/user.dart';
+import 'package:social_media_app/widgets/onTapImage.dart';
 
 class PostCard extends StatefulWidget {
   final snap;
@@ -32,16 +33,17 @@ class _PostCardState extends State<PostCard> {
   }
 
   void getComments() async {
-    try{
-      QuerySnapshot snap = await FirebaseFirestore.instance.collection('posts').doc(widget.snap['postId']).collection('comments').get();
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.snap['postId'])
+          .collection('comments')
+          .get();
       commentLength = snap.docs.length;
-    }
-    catch(e){
+    } catch (e) {
       showSnackBar(e.toString(), context);
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -52,7 +54,7 @@ class _PostCardState extends State<PostCard> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: width > webScreenSize?secondaryColor:mobileBackgroundColor,
+          color: width > webScreenSize ? secondaryColor : mobileBackgroundColor,
         ),
         color: mobileBackgroundColor,
       ),
@@ -105,7 +107,8 @@ class _PostCardState extends State<PostCard> {
                               .map(
                                 (e) => InkWell(
                                   onTap: () async {
-                                    FirestoreMethods().deletePost(widget.snap['postId']);
+                                    FirestoreMethods()
+                                        .deletePost(widget.snap['postId']);
                                     Navigator.of(context).pop();
                                   },
                                   child: Container(
@@ -130,12 +133,17 @@ class _PostCardState extends State<PostCard> {
 
           // Image Section
           GestureDetector(
+            onTap: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => OnTapImage(snap: widget.snap),),);
+            },
             onDoubleTap: () async {
               await FirestoreMethods().likePost(
-                widget.snap['postId'],
-                user.uid,
-                widget.snap['likes'],
-              );
+                  widget.snap['postId'],
+                  user.uid,
+                  widget.snap['likes'],
+                  widget.snap['username'],
+                  widget.snap['profImage'],
+                  "Liked");
               setState(() {
                 isLikeAnimating = true;
               });
@@ -190,7 +198,11 @@ class _PostCardState extends State<PostCard> {
                       widget.snap['postId'],
                       user.uid,
                       widget.snap['likes'],
+                      widget.snap['username'],
+                      widget.snap['profImage'],
+                      "Liked",
                     );
+
                   },
                   icon: widget.snap['likes'].contains(user.uid)
                       ? const Icon(
