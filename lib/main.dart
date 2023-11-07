@@ -13,7 +13,6 @@ import 'package:social_media_app/utils/colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-      // if there is an error inside the web, then re-check the web Configuration (kIsWeb)
       options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
